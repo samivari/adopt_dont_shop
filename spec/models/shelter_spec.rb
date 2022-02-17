@@ -21,12 +21,21 @@ RSpec.describe Shelter, type: :model do
     @pet_2 = @shelter_1.pets.create(name: 'Clawdia', breed: 'shorthair', age: 3, adoptable: true)
     @pet_3 = @shelter_3.pets.create(name: 'Lucille Bald', breed: 'sphynx', age: 8, adoptable: true)
     @pet_4 = @shelter_1.pets.create(name: 'Ann', breed: 'ragdoll', age: 5, adoptable: true)
+
+    @applicant_1 = Applicant.create!(name: 'Jerry', address_line_1: '123 First Street', city: 'Temecula', state: 'CA',
+                                     zipcode: '12345', description: 'I want more pets.', status: 'Pending')
+    @applicant_2 = Applicant.create!(name: 'Mo', address_line_1: '123 First Street', city: 'Temecula', state: 'CA',
+                                     zipcode: '12345', description: 'I want more pets.', status: 'Pending')
+    pet_application = PetApplication.create!(pet_id: @pet_1.id, applicant_id: @applicant_1.id,
+                                             status: 'Pending')
+    pet_application = PetApplication.create!(pet_id: @pet_3.id, applicant_id: @applicant_2.id,
+                                             status: 'Pending')
   end
 
   describe 'class methods' do
     describe '#search' do
       it 'returns partial matches' do
-        expect(Shelter.search("Fancy")).to eq([@shelter_3])
+        expect(Shelter.search('Fancy')).to eq([@shelter_3])
       end
     end
 
@@ -39,6 +48,17 @@ RSpec.describe Shelter, type: :model do
     describe '#order_by_number_of_pets' do
       it 'orders the shelters by number of pets they have, descending' do
         expect(Shelter.order_by_number_of_pets).to eq([@shelter_1, @shelter_3, @shelter_2])
+      end
+    end
+    describe '#reverse_alphabet' do
+      it 'returns pets associated with the given shelter in reverse alphabetical name order' do
+        expect(Shelter.reverse_alphabet).to eq([@shelter_2, @shelter_3, @shelter_1])
+      end
+    end
+
+    describe '#pending_apps' do
+      it 'retrieves all shelters with pending applications' do
+        expect(Shelter.pending_apps).to eq([@shelter_1, @shelter_3])
       end
     end
   end
